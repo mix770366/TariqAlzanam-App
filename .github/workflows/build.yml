@@ -9,7 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Extract Project
-        run: unzip -o TariqAlzanam-Updated-UI.zip
+        run: |
+          mkdir -p extracted
+          unzip -o TariqAlzanam-Updated-UI.zip -d extracted
+          PROJECT_DIR=$(dirname "$(find extracted -name 'settings.gradle.kts' | head -n 1)")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
       - uses: actions/setup-java@v4
         with:
           java-version: "17"
@@ -18,10 +22,11 @@ jobs:
         with:
           gradle-version: "9.3.1"
       - name: Build Debug APK
-        working-directory: Ay-Khadamat-main
-        run: gradle assembleDebug
+        run: |
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: Ay-Khadamat-main/app/build/outputs/apk/debug/*.apk
+          path: "**/app/build/outputs/apk/debug/*.apk"
