@@ -3,26 +3,28 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-- name: Extract Project
-  run: |
-    mkdir -p extracted
-    unzip -o TariqAlzanam-Updated-UI.zip -d extracted
 
-    SETTINGS_FILE=$(find extracted -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -n 1)
-    if [ -z "$SETTINGS_FILE" ]; then
-      echo "No Gradle settings file found in extracted archive"
-      exit 1
-    fi
+      - name: Extract Project
+        run: |
+          mkdir -p extracted
+          unzip -o TariqAlzanam-Updated-UI.zip -d extracted
 
-    PROJECT_DIR=$(dirname "$SETTINGS_FILE")
-    echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          SETTINGS_FILE=$(find extracted -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -n 1)
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "No Gradle settings file found in extracted archive"
+            exit 1
+          fi
 
-    if [ -f "google-services.json" ]; then
-      mkdir -p "$PROJECT_DIR/app"
-      cp -f google-services.json "$PROJECT_DIR/app/google-services.json"
-    fi
+          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
+          if [ -f "google-services.json" ]; then
+            mkdir -p "$PROJECT_DIR/app"
+            cp -f google-services.json "$PROJECT_DIR/app/google-services.json"
+          fi
