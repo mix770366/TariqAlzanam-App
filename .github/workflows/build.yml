@@ -8,26 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract Project
-        run: |
-          mkdir -p extracted
-          unzip -o TariqAlzanam-Updated-UI.zip -d extracted
-          PROJECT_DIR=$(dirname "$(find extracted -name 'settings.gradle.kts' | head -n 1)")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
-          cp -f google-services*.json "$PROJECT_DIR/app/google-services.json" || true
-      - uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: "temurin"
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.3.1"
-      - name: Build Debug APK
-        run: |
-          cd "$PROJECT_DIR"
-          gradle assembleDebug
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: "**/app/build/outputs/apk/debug/*.apk"
+- name: Extract Project
+  run: |
+    mkdir -p extracted
+    unzip -o TariqAlzanam-Updated-UI.zip -d extracted
+
+    SETTINGS_FILE=$(find extracted -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -n 1)
+    if [ -z "$SETTINGS_FILE" ]; then
+      echo "No Gradle settings file found in extracted archive"
+      exit 1
+    fi
+
+    PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+    echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
+    if [ -f "google-services.json" ]; then
+      mkdir -p "$PROJECT_DIR/app"
+      cp -f google-services.json "$PROJECT_DIR/app/google-services.json"
+    fi
