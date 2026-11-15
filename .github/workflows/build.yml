@@ -11,7 +11,7 @@ jobs:
       - name: Extract Project
         run: |
           mkdir -p extracted
-          unzip -o TariqAlzanam-Updated-UI.zip -d extracted
+          unzip -o TariqAlzanam*.zip -d extracted
           PROJECT_DIR=$(dirname "$(find extracted -name 'settings.gradle.kts' | head -n 1)")
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           cp -f google-services*.json "$PROJECT_DIR/app/google-services.json" || true
